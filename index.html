@@ -1,0 +1,1500 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RIANG - Repositori Interaktif Anak dan Guru</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    animation: {
+                        'podium': 'podium 0.5s ease-out forwards',
+                        'bounce-short': 'bounce-short 0.3s ease-out forwards',
+                    },
+                    keyframes: {
+                        'podium': {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        },
+                        'bounce-short': {
+                            '0%': { transform: 'scale(0.95)', opacity: '0' },
+                            '100%': { transform: 'scale(1)', opacity: '1' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Custom CSS -->
+    <style>
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .animate-in { animation: fadeIn 0.5s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        html { scroll-behavior: smooth; }
+    </style>
+
+    <!-- Babel Standalone untuk kompilasi JSX di browser -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body class="bg-gray-50 font-sans selection:bg-red-200 selection:text-red-900">
+    
+    <!-- Container untuk Aplikasi React -->
+    <div id="root"></div>
+
+    <!-- Script Aplikasi React -->
+    <script type="text/babel" data-type="module">
+        // Import React & ReactDOM
+        import React, { useState, useEffect, useRef } from 'https://esm.sh/react@18.2.0';
+        import { createRoot } from 'https://esm.sh/react-dom@18.2.0/client';
+        
+        // Import Icons dari Lucide-React
+        import { BookOpen, Search, PlayCircle, FileText, ChevronRight, ChevronLeft, Menu, X, Star, Users, Award, BookOpenCheck, LayoutDashboard, Plus, Trash2, Edit, Save, Image as ImageIcon, Video, File, Lock, Unlock, LogOut, CheckCircle2, AlertCircle, Loader2, ArrowLeft, Trophy, Medal, Crown, MessageSquare, MessageSquarePlus, Download, Share2, Gamepad2, MonitorPlay } from 'https://esm.sh/lucide-react@0.292.0';
+        
+        // Import Firebase
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
+        import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
+        import { getFirestore, collection, onSnapshot, doc, addDoc, updateDoc, deleteDoc, query, orderBy } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
+
+        // --- FIREBASE SETUP ---
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'riang-edu-app';
+
+        // --- MULAI KODE FOOTER ---
+const Footer = () => {
+    // Memanggil icon dari Lucide
+    const { BookOpen, ChevronRight, Mail, Phone, MapPin, Facebook, Instagram, Youtube } = lucide;
+
+    return (
+        <footer className="bg-gradient-to-r from-blue-900 to-indigo-900 text-white pt-16 pb-8 mt-12 shadow-inner w-full">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+                    {/* Bagian Brand / Logo */}
+                    <div className="space-y-4 md:col-span-2">
+                        <h3 className="text-3xl font-extrabold flex items-center gap-3 tracking-wide">
+                            <span className="text-yellow-400 bg-white/10 p-2 rounded-lg">
+                                <BookOpen size={28} />
+                            </span>
+                            RIANG
+                        </h3>
+                        <p className="text-blue-200 text-base leading-relaxed max-w-md">
+                            Repositori Interaktif Anak dan Guru. Platform belajar yang menyenangkan, interaktif, dan mudah diakses untuk mendukung kemajuan pendidikan di Indonesia.
+                        </p>
+                    </div>
+
+                    {/* Bagian Tautan Cepat */}
+                    <div>
+                        <h4 className="text-lg font-bold mb-6 text-white border-b-2 border-yellow-400 pb-2 inline-block">Tautan Cepat</h4>
+                        <ul className="space-y-3">
+                            <li><a href="#" className="text-blue-200 hover:text-yellow-400 hover:translate-x-2 transition-transform duration-300 flex items-center gap-2"><ChevronRight size={16} /> Beranda</a></li>
+                            <li><a href="#" className="text-blue-200 hover:text-yellow-400 hover:translate-x-2 transition-transform duration-300 flex items-center gap-2"><ChevronRight size={16} /> Modul Belajar</a></li>
+                            <li><a href="#" className="text-blue-200 hover:text-yellow-400 hover:translate-x-2 transition-transform duration-300 flex items-center gap-2"><ChevronRight size={16} /> Testimoni</a></li>
+                            <li><a href="#" className="text-blue-200 hover:text-yellow-400 hover:translate-x-2 transition-transform duration-300 flex items-center gap-2"><ChevronRight size={16} /> Pusat Bantuan</a></li>
+                        </ul>
+                    </div>
+
+                    {/* Bagian Kontak & Sosial Media */}
+                    <div>
+                        <h4 className="text-lg font-bold mb-6 text-white border-b-2 border-yellow-400 pb-2 inline-block">Hubungi Kami</h4>
+                        <div className="space-y-3 text-blue-200 text-sm mb-6">
+                            <p className="flex items-center gap-3 hover:text-white transition-colors cursor-pointer"><Mail size={16} /> info@riang.edu.id</p>
+                            <p className="flex items-center gap-3 hover:text-white transition-colors cursor-pointer"><Phone size={16} /> +62 800 1234 5678</p>
+                            <p className="flex items-center gap-3 hover:text-white transition-colors cursor-pointer"><MapPin size={16} /> Jl. Pendidikan No. 1, Jakarta</p>
+                        </div>
+                        <div className="flex gap-3">
+                            <a href="#" className="w-10 h-10 rounded-full bg-blue-800/50 border border-blue-700 flex items-center justify-center hover:bg-yellow-400 hover:text-blue-900 hover:border-yellow-400 transition-all shadow-lg"><Facebook size={20} /></a>
+                            <a href="#" className="w-10 h-10 rounded-full bg-blue-800/50 border border-blue-700 flex items-center justify-center hover:bg-yellow-400 hover:text-blue-900 hover:border-yellow-400 transition-all shadow-lg"><Instagram size={20} /></a>
+                            <a href="#" className="w-10 h-10 rounded-full bg-blue-800/50 border border-blue-700 flex items-center justify-center hover:bg-yellow-400 hover:text-blue-900 hover:border-yellow-400 transition-all shadow-lg"><Youtube size={20} /></a>
+                        </div>
+                    </div>
+                </div>
+                
+                {/* Bagian Copyright */}
+                <div className="border-t border-blue-800/50 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                    <p className="text-blue-300 text-sm text-center md:text-left font-medium">
+                        &copy; {new Date().getFullYear()} RIANG - Hak Cipta Dilindungi.
+                    </p>
+                    <div className="flex gap-6 text-sm text-blue-300">
+                        <a href="#" className="hover:text-yellow-400 transition-colors">Kebijakan Privasi</a>
+                        <a href="#" className="hover:text-yellow-400 transition-colors">Syarat & Ketentuan</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    );
+};
+// --- AKHIR KODE FOOTER ---
+
+
+        const App = () => {
+            // --- STATE MANAGEMENT ---
+            const [user, setUser] = useState(null);
+            const [isAdmin, setIsAdmin] = useState(false);
+            const [currentView, setCurrentView] = useState('landing'); // landing, dashboard, subject
+            const [activeSubject, setActiveSubject] = useState(null);
+            const [isMenuOpen, setIsMenuOpen] = useState(false);
+            const [isLoading, setIsLoading] = useState(true);
+            
+            // Pagination States
+            const [currentPage, setCurrentPage] = useState(1);
+            const [itemsPerPage, setItemsPerPage] = useState(10);
+
+            // Login State
+            const [showLoginModal, setShowLoginModal] = useState(false);
+            const [passwordInput, setPasswordInput] = useState('');
+
+            // Data States
+            const [mediaItems, setMediaItems] = useState([]);
+            const [contributors, setContributors] = useState([]);
+            const [testimonials, setTestimonials] = useState([]);
+
+            // Form/Editing State
+            const [editingMedia, setEditingMedia] = useState(null);
+            const [editingContributor, setEditingContributor] = useState(null);
+            const [editingTestimoni, setEditingTestimoni] = useState(null);
+            
+                // ==========================================
+    // BACKEND: Fungsi untuk mengirim data ke GAS
+    // ==========================================
+    const GAS_URL = "[https://script.google.com/macros/s/AKfycbynmTX_8RPqDDUKMpwU-0bquCTbh42MfZRFp9OAQolyZTvKuVNA7j3g0qI3klzemH0i/exec](https://script.google.com/macros/s/AKfycbynmTX_8RPqDDUKMpwU-0bquCTbh42MfZRFp9OAQolyZTvKuVNA7j3g0qI3klzemH0i/exec)";
+
+    const kirimDataKeSpreadsheet = async (tipeData, dataPayload) => {
+        // Kita gabungkan tipe data (misal: 'testimoni', 'skor_kuis') dengan data aslinya
+        const dataFinal = {
+            action: tipeData,
+            ...dataPayload,
+            waktu: new Date().toLocaleString('id-ID')
+        };
+
+        // Mengubah format data agar aman dari pemblokiran CORS browser
+        const formData = new URLSearchParams();
+        Object.keys(dataFinal).forEach(key => {
+            formData.append(key, dataFinal[key]);
+        });
+
+        try {
+            // mode: 'no-cors' sangat penting agar browser tidak menampilkan pesan error merah
+            await fetch(GAS_URL, {
+                method: 'POST',
+                mode: 'no-cors', 
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: formData
+            });
+            
+            console.log(`Data [${tipeData}] berhasil dikirim ke antrean!`);
+            return true;
+        } catch (error) {
+            console.error("Gagal mengirim data:", error);
+            return false;
+        }
+    };
+    // ==========================================
+
+            // Public Form State (Testimoni)
+            const [showPublicTestimoniModal, setShowPublicTestimoniModal] = useState(false);
+            const [publicTestimoni, setPublicTestimoni] = useState({ name: '', category: 'Testimoni Siswa', rating: 5, text: '' });
+            
+            // Toast State
+            const [toast, setToast] = useState({ show: false, title: '', message: '', type: 'success' });
+
+            // Slider Ref
+            const sliderRef = useRef(null);
+            const scrollSlider = (direction) => {
+                if (sliderRef.current) {
+                    const scrollAmount = window.innerWidth < 768 ? 296 : 364; 
+                    sliderRef.current.scrollBy({ left: direction === 'left' ? -scrollAmount : scrollAmount, behavior: 'smooth' });
+                }
+            };
+
+            // --- AUTHENTICATION ---
+            useEffect(() => {
+                const initAuth = async () => {
+                    try {
+                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                            await signInWithCustomToken(auth, __initial_auth_token);
+                        } else {
+                            await signInAnonymously(auth);
+                        }
+                    } catch (error) {
+                        console.error("Auth error:", error);
+                        showToast('Error', 'Gagal terhubung ke sistem otentikasi.', 'error');
+                    }
+                };
+                initAuth();
+
+                const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+                    setUser(currentUser);
+                });
+                return () => unsubscribe();
+            }, []);
+
+            // --- FETCH DATA (READ) ---
+            useEffect(() => {
+                if (!user) return;
+
+                setIsLoading(true);
+
+                const mediaUnsub = onSnapshot(
+                    collection(db, 'artifacts', appId, 'public', 'data', 'media'),
+                    (snapshot) => {
+                        const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                        setMediaItems(items);
+                    },
+                    (error) => console.error("Error fetching media:", error)
+                );
+
+                const contUnsub = onSnapshot(
+                    collection(db, 'artifacts', appId, 'public', 'data', 'contributors'),
+                    (snapshot) => {
+                        const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                        items.sort((a, b) => (b.points || 0) - (a.points || 0));
+                        setContributors(items);
+                    },
+                    (error) => console.error("Error fetching contributors:", error)
+                );
+
+                const testUnsub = onSnapshot(
+                    collection(db, 'artifacts', appId, 'public', 'data', 'testimonials'),
+                    (snapshot) => {
+                        const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                        setTestimonials(items);
+                        setIsLoading(false);
+                    },
+                    (error) => console.error("Error fetching testimonials:", error)
+                );
+
+                return () => {
+                    mediaUnsub();
+                    contUnsub();
+                    testUnsub();
+                };
+            }, [user, appId]);
+
+            // --- HELPERS ---
+            const showToast = (title, message, type = 'success') => {
+                setToast({ show: true, title, message, type });
+                setTimeout(() => setToast({ show: false, title: '', message: '', type: 'success' }), 3000);
+            };
+
+            const scrollToBeranda = () => {
+                setCurrentView('landing');
+                setTimeout(() => {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }, 100);
+            };
+
+            // --- ADMIN LOGIN LOGIC ---
+            const handleLoginAdminClick = () => {
+                setShowLoginModal(true);
+                setIsMenuOpen(false); // Tutup menu mobile jika terbuka
+            };
+
+            const handleLoginSubmit = (e) => {
+                e.preventDefault();
+                // Verifikasi password "k0mbel"
+                if (passwordInput === 'k0mbel') {
+                    setIsAdmin(true);
+                    setCurrentView('dashboard');
+                    setShowLoginModal(false);
+                    setPasswordInput('');
+                    showToast('Berhasil', 'Selamat datang, Admin!');
+                } else {
+                    showToast('Gagal', 'Password yang Anda masukkan salah.', 'error');
+                }
+            };
+
+            const handleLogoutAdmin = () => {
+                setIsAdmin(false);
+                setCurrentView('landing');
+                setIsMenuOpen(false);
+                showToast('Berhasil', 'Keluar dari mode Admin');
+            };
+
+            const handleOpenSubject = (subject) => {
+                setActiveSubject(subject);
+                setCurrentPage(1); // Reset Pagination ke halaman 1 saat ganti subjek
+                setCurrentView('subject');
+                window.scrollTo(0, 0);
+            };
+
+            // Menangani perubahan item per halaman
+            const handleItemsPerPageChange = (e) => {
+                setItemsPerPage(Number(e.target.value));
+                setCurrentPage(1); // Reset ke halaman pertama saat ganti jumlah limit data
+            };
+
+            // --- CRUD MEDIA ---
+            const handleSaveMedia = async (e) => {
+                e.preventDefault();
+                if (!user) return;
+
+                try {
+                    const collectionRef = collection(db, 'artifacts', appId, 'public', 'data', 'media');
+                    if (editingMedia.id) {
+                        await updateDoc(doc(collectionRef, editingMedia.id), editingMedia);
+                        showToast('Berhasil', 'Materi berhasil diperbarui.');
+                    } else {
+                        await addDoc(collectionRef, { ...editingMedia, createdAt: new Date().toISOString() });
+                        showToast('Berhasil', 'Materi baru berhasil ditambahkan.');
+                    }
+                    setEditingMedia(null);
+                } catch (error) {
+                    console.error("Error saving media:", error);
+                    showToast('Gagal', 'Terjadi kesalahan saat menyimpan materi.', 'error');
+                }
+            };
+
+            const handleDeleteMedia = async (id) => {
+                if (!user) return;
+                try {
+                    await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'media', id));
+                    showToast('Berhasil', 'Materi berhasil dihapus.');
+                } catch (error) {
+                    console.error("Error deleting media:", error);
+                    showToast('Gagal', 'Terjadi kesalahan saat menghapus materi.', 'error');
+                }
+            };
+
+            // --- CRUD CONTRIBUTORS ---
+            const handleSaveContributor = async (e) => {
+                e.preventDefault();
+                if (!user) return;
+                try {
+                    const collectionRef = collection(db, 'artifacts', appId, 'public', 'data', 'contributors');
+                    const dataToSave = { ...editingContributor, points: parseInt(editingContributor.points) || 0 };
+                    
+                    if (editingContributor.id) {
+                        await updateDoc(doc(collectionRef, editingContributor.id), dataToSave);
+                        showToast('Berhasil', 'Kontributor diperbarui.');
+                    } else {
+                        await addDoc(collectionRef, { ...dataToSave, createdAt: new Date().toISOString() });
+                        showToast('Berhasil', 'Kontributor ditambahkan.');
+                    }
+                    setEditingContributor(null);
+                } catch (error) {
+                    console.error("Error saving cont:", error);
+                    showToast('Gagal', 'Terjadi kesalahan.', 'error');
+                }
+            };
+
+            const handleDeleteContributor = async (id) => {
+                if (!user) return;
+                try {
+                    await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'contributors', id));
+                    showToast('Berhasil', 'Kontributor dihapus.');
+                } catch (error) {
+                    console.error("Error deleting cont:", error);
+                }
+            };
+
+            // --- CRUD TESTIMONI (ADMIN) ---
+            const handleSaveTestimoni = async (e) => {
+                e.preventDefault();
+                if (!user) return;
+                try {
+                    const collectionRef = collection(db, 'artifacts', appId, 'public', 'data', 'testimonials');
+                    if (editingTestimoni.id) {
+                        await updateDoc(doc(collectionRef, editingTestimoni.id), editingTestimoni);
+                        showToast('Berhasil', 'Testimoni diperbarui.');
+                    } else {
+                        await addDoc(collectionRef, { ...editingTestimoni, createdAt: new Date().toISOString() });
+                        showToast('Berhasil', 'Testimoni ditambahkan.');
+                    }
+                    setEditingTestimoni(null);
+                } catch (error) {
+                    console.error("Error saving test:", error);
+                    showToast('Gagal', 'Terjadi kesalahan.', 'error');
+                }
+            };
+
+            const handleDeleteTestimoni = async (id) => {
+                if (!user) return;
+                try {
+                    await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'testimonials', id));
+                    showToast('Berhasil', 'Testimoni dihapus.');
+                } catch (error) {
+                    console.error("Error deleting test:", error);
+                }
+            };
+
+            // --- PUBLIC FORM TESTIMONI ---
+            const handlePublicSubmitTestimoni = async (e) => {
+                e.preventDefault();
+                if (!user) {
+                    showToast('Error', 'Anda harus terhubung ke sistem untuk mengirim testimoni.', 'error');
+                    return;
+                }
+
+                if (!publicTestimoni.name || !publicTestimoni.text) {
+                    showToast('Peringatan', 'Harap isi nama dan pesan testimoni.', 'error');
+                    return;
+                }
+
+                try {
+                    const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+                    const todayDate = new Date().toLocaleDateString('id-ID', dateOptions);
+
+                    const collectionRef = collection(db, 'artifacts', appId, 'public', 'data', 'testimonials');
+                    await addDoc(collectionRef, { 
+                        ...publicTestimoni, 
+                        date: todayDate,
+                        createdAt: new Date().toISOString() 
+                    });
+                    
+                    showToast('Berhasil', 'Testimoni Anda berhasil dikirim! Terima kasih atas partisipasinya.');
+                    setShowPublicTestimoniModal(false);
+                    setPublicTestimoni({ name: '', category: 'Testimoni Siswa', rating: 5, text: '' });
+                } catch (error) {
+                    console.error("Error saving public test:", error);
+                    showToast('Gagal', 'Gagal mengirim testimoni, silakan coba lagi.', 'error');
+                }
+            };
+
+
+            // --- PENGELOLAAN PAGINASI UNTUK MATA PELAJARAN ---
+            const subjectMedia = mediaItems.filter(m => m.subject === activeSubject);
+            const totalPages = Math.ceil(subjectMedia.length / itemsPerPage);
+            const indexOfLastItem = currentPage * itemsPerPage;
+            const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+            const currentItems = subjectMedia.slice(indexOfFirstItem, indexOfLastItem);
+
+
+            // --- COMPONENTS ---
+            const Toast = () => {
+                if (!toast.show) return null;
+                return (
+                    <div className="fixed bottom-4 right-4 z-50 animate-bounce-short">
+                        <div className={`flex items-center gap-3 px-4 py-3 rounded-lg shadow-xl text-white ${toast.type === 'error' ? 'bg-red-600' : 'bg-gray-900'}`}>
+                            {toast.type === 'error' ? <AlertCircle size={20} /> : <CheckCircle2 size={20} className="text-green-400" />}
+                            <div>
+                                <p className="font-bold text-sm">{toast.title}</p>
+                                <p className="text-xs opacity-90">{toast.message}</p>
+                            </div>
+                        </div>
+                    </div>
+                );
+            };
+
+            const Navbar = () => (
+                <nav className="bg-white/90 backdrop-blur-md sticky top-0 z-40 border-b border-gray-100">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="flex justify-between h-16 items-center">
+                            <div className="flex items-center gap-2 cursor-pointer" onClick={scrollToBeranda}>
+                                <div className="bg-red-600 text-white p-2 rounded-lg"><BookOpen size={24} /></div>
+                                <span className="font-extrabold text-2xl tracking-tight text-gray-900">RIANG</span>
+                            </div>
+
+                            <div className="hidden md:flex items-center space-x-8">
+                                <button 
+                                    onClick={scrollToBeranda} 
+                                    className={`transition ${currentView === 'landing' ? 'text-red-600 font-bold' : 'text-gray-600 hover:text-red-600 font-medium'}`}
+                                >
+                                    Beranda
+                                </button>
+                                
+                                <a href="#subjects" className="text-gray-600 hover:text-red-600 font-medium transition">Mata Pelajaran</a>
+                                <a href="#testimoni" className="text-gray-600 hover:text-red-600 font-medium transition">Testimoni</a>
+                                <a href="#contributors" className="text-gray-600 hover:text-red-600 font-medium transition">Kontributor</a>
+                                
+                                {isAdmin ? (
+                                    <div className="flex items-center gap-4">
+                                        <button onClick={() => setCurrentView('dashboard')} className={`px-4 py-2 rounded-lg font-bold flex items-center gap-2 transition ${currentView === 'dashboard' ? 'bg-red-600 text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-800'}`}>
+                                            <LayoutDashboard size={18} /> Admin Panel
+                                        </button>
+                                        <button onClick={handleLogoutAdmin} className="text-gray-500 hover:text-red-600 transition"><LogOut size={20} /></button>
+                                    </div>
+                                ) : (
+                                    <button onClick={handleLoginAdminClick} className="bg-red-50 text-red-600 hover:bg-red-100 px-4 py-2 rounded-lg font-bold flex items-center gap-2 transition">
+                                        <Lock size={18} /> Login Admin
+                                    </button>
+                                )}
+                            </div>
+
+                            <div className="md:hidden">
+                                <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-gray-600">
+                                    {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Mobile Menu */}
+                    {isMenuOpen && (
+                        <div className="md:hidden bg-white border-b border-gray-100 shadow-lg absolute w-full">
+                            <div className="px-4 pt-2 pb-6 space-y-3">
+                                <button 
+                                    onClick={() => { 
+                                        scrollToBeranda();
+                                        setIsMenuOpen(false); 
+                                    }} 
+                                    className={`block w-full text-left px-3 py-2 rounded-md transition ${currentView === 'landing' ? 'bg-red-50 text-red-600 font-bold' : 'text-gray-700 font-medium hover:bg-red-50 hover:text-red-600'}`}
+                                >
+                                    Beranda
+                                </button>
+                                
+                                <a href="#subjects" onClick={() => setIsMenuOpen(false)} className="block px-3 py-2 text-gray-700 font-medium hover:bg-red-50 hover:text-red-600 rounded-md">Mata Pelajaran</a>
+                                <a href="#testimoni" onClick={() => setIsMenuOpen(false)} className="block px-3 py-2 text-gray-700 font-medium hover:bg-red-50 hover:text-red-600 rounded-md">Testimoni</a>
+                                <a href="#contributors" onClick={() => setIsMenuOpen(false)} className="block px-3 py-2 text-gray-700 font-medium hover:bg-red-50 hover:text-red-600 rounded-md">Kontributor</a>
+                                
+                                <div className="pt-4 border-t border-gray-100">
+                                    {isAdmin ? (
+                                        <div className="space-y-2">
+                                            <button onClick={() => { setCurrentView('dashboard'); setIsMenuOpen(false); }} className={`w-full flex items-center gap-2 px-3 py-2 rounded-md font-bold ${currentView === 'dashboard' ? 'bg-red-600 text-white' : 'bg-gray-100 text-gray-800'}`}>
+                                                <LayoutDashboard size={18} /> Admin Panel
+                                            </button>
+                                            <button onClick={handleLogoutAdmin} className="w-full flex items-center gap-2 px-3 py-2 text-red-600 font-bold rounded-md">
+                                                <LogOut size={18} /> Logout
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <button onClick={handleLoginAdminClick} className="w-full flex items-center gap-2 px-3 py-2 bg-red-50 text-red-600 rounded-md font-bold">
+                                            <Lock size={18} /> Login Admin
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </nav>
+            );
+
+            return (
+                <div className="min-h-screen">
+                    <Navbar />
+                    <Toast />
+
+                    <main>
+                        {/* VIEW: LANDING PAGE */}
+                        {currentView === 'landing' && (
+                            <div className="animate-in fade-in duration-500">
+                                {/* HERO SECTION */}
+                                <section id="beranda" className="bg-gradient-to-br from-red-600 via-red-700 to-red-900 text-white py-20 lg:py-32 overflow-hidden relative">
+                                    {/* Abstract Shapes */}
+                                    <div className="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 rounded-full bg-red-500 opacity-20 blur-3xl"></div>
+                                    <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 rounded-full bg-orange-500 opacity-20 blur-3xl"></div>
+
+                                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                                        <div className="grid lg:grid-cols-2 gap-12 items-center">
+                                            <div>
+                                                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur border border-white/20 text-sm font-medium mb-6">
+                                                    <span className="flex h-2 w-2 relative">
+                                                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                                      <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                                                    </span>
+                                                    Platform Pembelajaran Interaktif SD
+                                                </div>
+                                                <h1 className="text-4xl lg:text-6xl font-black leading-tight mb-6">
+                                                    Belajar Lebih <span className="text-yellow-400">Menyenangkan</span> Bersama RIANG
+                                                </h1>
+                                                <p className="text-lg lg:text-xl text-red-100 mb-8 max-w-lg leading-relaxed">
+                                                    Repositori Interaktif Anak dan Guru. Akses ratusan materi pelajaran, video edukasi, game pembelajaran (PID), dan modul interaktif khusus untuk siswa Sekolah Dasar.
+                                                </p>
+                                                <div className="flex flex-wrap gap-4">
+                                                    <a href="#subjects" className="bg-yellow-400 hover:bg-yellow-300 text-red-900 font-extrabold px-8 py-4 rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center gap-2">
+                                                        Mulai Belajar <ChevronRight size={20} />
+                                                    </a>
+                                                    {/* TOMBOL TAMBAH KARYA */}
+                                                    <a 
+                                                        href="https://s.id/tambahkarya-riang" 
+                                                        target="_blank" 
+                                                        rel="noopener noreferrer" 
+                                                        className="bg-white/10 hover:bg-white/20 backdrop-blur border border-white/30 text-white font-bold px-8 py-4 rounded-xl transition-all flex items-center gap-2"
+                                                    >
+                                                        Tambah Karya <Plus size={20} />
+                                                    </a>
+                                                </div>
+                                            </div>
+                                            
+                                            <div className="hidden lg:block relative">
+                                                <div className="relative rounded-2xl overflow-hidden shadow-2xl border-4 border-white/20 transform rotate-2 hover:rotate-0 transition-all duration-500">
+                                                    <img src="https://imgur.com/R46pBkf.png" alt="Anak-anak belajar" className="w-full h-auto object-cover" />
+                                                    <div className="absolute inset-0 bg-gradient-to-t from-red-900/80 to-transparent flex items-end p-8">
+                                                        <div className="text-white">
+                                                            <div className="flex items-center gap-2 mb-2">
+                                                                <Star className="text-yellow-400 fill-current" size={20} />
+                                                                <Star className="text-yellow-400 fill-current" size={20} />
+                                                                <Star className="text-yellow-400 fill-current" size={20} />
+                                                                <Star className="text-yellow-400 fill-current" size={20} />
+                                                                <Star className="text-yellow-400 fill-current" size={20} />
+                                                            </div>
+                                                            <p className="font-bold text-lg">"Platform yang sangat membantu anak saya belajar di rumah!"</p>
+                                                            <p className="text-red-200 text-sm mt-1">- Bunda Sarah, Orang Tua Murid</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                {/* Floating badges */}
+                                                <div className="absolute -left-6 top-10 bg-white p-4 rounded-xl shadow-xl border border-gray-100 animate-bounce" style={{ animationDuration: '3s' }}>
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="bg-green-100 p-2 rounded-lg text-green-600"><BookOpenCheck size={24} /></div>
+                                                        <div>
+                                                            <p className="text-xs text-gray-500 font-bold uppercase">Materi</p>
+                                                            <p className="text-lg font-black text-gray-900">500+</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div className="absolute -right-6 bottom-20 bg-white p-4 rounded-xl shadow-xl border border-gray-100 animate-bounce" style={{ animationDuration: '4s' }}>
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="bg-blue-100 p-2 rounded-lg text-blue-600"><Users size={24} /></div>
+                                                        <div>
+                                                            <p className="text-xs text-gray-500 font-bold uppercase">Siswa Aktif</p>
+                                                            <p className="text-lg font-black text-gray-900">10k+</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </section>
+
+                                {/* SUBJECTS SECTION */}
+                                <section id="subjects" className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                                    <div className="text-center mb-16">
+                                        <span className="bg-red-100 text-red-600 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">Pilih Pelajaran</span>
+                                        <h2 className="mt-3 text-3xl md:text-4xl font-extrabold text-gray-900">Mata Pelajaran Tersedia</h2>
+                                        <p className="text-gray-500 mt-3 max-w-2xl mx-auto">Materi disesuaikan dengan kurikulum terbaru, disajikan dengan bahasa yang mudah dipahami anak-anak.</p>
+                                    </div>
+
+                                    {/* MAIN SUBJECT GRID */}
+                                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
+                                        {[
+                                            { name: 'Matematika', icon: '➗', color: 'bg-blue-50 text-blue-600 border-blue-100', hover: 'hover:border-blue-300 hover:shadow-blue-100' },
+                                            { name: 'B. Indonesia', icon: '📖', color: 'bg-orange-50 text-orange-600 border-orange-100', hover: 'hover:border-orange-300 hover:shadow-orange-100' },
+                                            { name: 'IPAS', icon: '🌍', color: 'bg-green-50 text-green-600 border-green-100', hover: 'hover:border-green-300 hover:shadow-green-100' },
+                                            { name: 'B. Inggris', icon: '💬', color: 'bg-purple-50 text-purple-600 border-purple-100', hover: 'hover:border-purple-300 hover:shadow-purple-100' },
+                                            { name: 'Game PID', icon: '🎮', color: 'bg-indigo-50 text-indigo-600 border-indigo-100', hover: 'hover:border-indigo-300 hover:shadow-indigo-100', badge: 'Baru!' },
+                                        ].map((subj) => (
+                                            <div 
+                                                key={subj.name} 
+                                                onClick={() => handleOpenSubject(subj.name)}
+                                                className={`cursor-pointer rounded-2xl p-6 md:p-8 text-center border-2 transition-all duration-300 hover:-translate-y-1 shadow-sm hover:shadow-lg ${subj.color} ${subj.hover} group bg-white relative`}
+                                            >
+                                                {subj.badge && (
+                                                    <span className="absolute -top-3 -right-3 bg-red-500 text-white text-[10px] font-black px-2.5 py-1 rounded-full animate-pulse shadow-md z-10">
+                                                        {subj.badge}
+                                                    </span>
+                                                )}
+                                                <div className={`text-4xl md:text-5xl mb-4 group-hover:scale-110 transition-transform duration-300`}>{subj.icon}</div>
+                                                <h3 className="font-extrabold text-gray-900 md:text-lg">{subj.name}</h3>
+                                                <p className="text-xs text-gray-500 mt-2 font-medium">Lihat Materi &rarr;</p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    
+                                    {/* MORE SUBJECTS */}
+                                    <div className="mt-8 flex justify-center">
+                                        <div className="bg-red-50 rounded-2xl p-6 text-center border border-red-100 w-full md:w-auto">
+                                            <h3 className="text-lg font-bold text-gray-900 mb-3">Jelajahi Pilihan Lainnya</h3>
+                                            <div className="flex flex-wrap justify-center gap-2">
+                                                {['Agama', 'Pancasila', 'Seni Budaya', 'Informatika', 'PJOK', 'B. Lampung', 'Lainnya'].map((subj) => (
+                                                <button 
+                                                    key={subj}
+                                                    onClick={() => handleOpenSubject(subj)} 
+                                                    className="px-3 py-1.5 bg-white border border-gray-200 text-gray-600 rounded-lg hover:bg-red-600 hover:text-white hover:border-red-600 transition text-xs font-bold shadow-sm"
+                                                >
+                                                    {subj}
+                                                </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </section>
+
+                                {/* TESTIMONI SECTION (SLIDER) */}
+                                <section id="testimoni" className="py-16 bg-gray-50 border-t border-gray-200 overflow-hidden relative">
+                                    <div className="max-w-5xl mx-auto px-4 sm:px-6 relative">
+                                        <div className="text-center mb-12 relative z-10">
+                                            <span className="bg-yellow-100 text-yellow-600 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">Testimoni & Pendapat</span>
+                                            <h2 className="mt-3 text-3xl font-extrabold text-gray-900">Apa Kata Mereka?</h2>
+                                            <p className="text-gray-500 text-sm mt-2">Kesan dan pesan dari siswa, guru, dan orang tua tentang RIANG.</p>
+                                        </div>
+                                        
+                                        <div className="relative group">
+                                            {/* Navigation Buttons (Desktop) */}
+                                            <button onClick={() => scrollSlider('left')} className="hidden md:flex opacity-0 group-hover:opacity-100 absolute -left-5 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white rounded-full shadow-xl border border-gray-100 items-center justify-center text-gray-600 hover:text-red-600 hover:scale-105 transition-all">
+                                                <ChevronLeft size={28} />
+                                            </button>
+                                            <button onClick={() => scrollSlider('right')} className="hidden md:flex opacity-0 group-hover:opacity-100 absolute -right-5 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white rounded-full shadow-xl border border-gray-100 items-center justify-center text-gray-600 hover:text-red-600 hover:scale-105 transition-all">
+                                                <ChevronRight size={28} />
+                                            </button>
+
+                                            {/* Slider Container */}
+                                            <div ref={sliderRef} className="flex overflow-x-auto gap-4 md:gap-6 pb-8 snap-x snap-mandatory no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0 scroll-smooth">
+                                                {isLoading && testimonials.length === 0 ? (
+                                                    <div className="w-full py-16 flex flex-col items-center justify-center text-gray-400">
+                                                        <Loader2 className="animate-spin mb-3" size={32} />
+                                                        <span className="text-sm">Memuat Testimoni...</span>
+                                                    </div>
+                                                ) : testimonials.length > 0 ? (
+                                                    testimonials.slice().reverse().map(item => {
+                                                        const isSiswa = item.category.includes('Siswa');
+                                                        const isGuru = item.category.includes('Guru');
+                                                        
+                                                        return (
+                                                            <div key={item.id} className="min-w-[280px] w-[280px] md:min-w-[340px] md:w-[340px] bg-white rounded-2xl p-6 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] border border-gray-100 snap-center shrink-0 flex flex-col hover:-translate-y-1 hover:shadow-lg transition-all duration-300">
+                                                                <div className="flex justify-between items-start mb-4">
+                                                                    <div className="flex text-yellow-400 gap-0.5">
+                                                                        {Array.from({length: parseInt(item.rating || 5)}).map((_, i) => <Star key={i} size={14} fill="currentColor" />)}
+                                                                    </div>
+                                                                    <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border ${
+                                                                        isSiswa ? 'bg-blue-50 text-blue-600 border-blue-100' : 
+                                                                        isGuru ? 'bg-green-50 text-green-600 border-green-100' : 
+                                                                        'bg-purple-50 text-purple-600 border-purple-100'
+                                                                    }`}>
+                                                                        {item.category.replace('Testimoni ', '')}
+                                                                    </span>
+                                                                </div>
+                                                                <p className="text-gray-700 italic mb-6 text-sm flex-1 leading-relaxed">"{item.text}"</p>
+                                                                <div className="flex items-center gap-3 pt-4 border-t border-gray-50">
+                                                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0 shadow-sm ${
+                                                                        isSiswa ? 'bg-gradient-to-br from-blue-400 to-blue-600' : 
+                                                                        isGuru ? 'bg-gradient-to-br from-green-400 to-green-600' : 
+                                                                        'bg-gradient-to-br from-purple-400 to-purple-600'
+                                                                    }`}>
+                                                                        {item.name.charAt(0).toUpperCase()}
+                                                                    </div>
+                                                                    <div>
+                                                                        <p className="font-bold text-gray-900 text-sm line-clamp-1">{item.name}</p>
+                                                                        <p className="text-[10px] text-gray-500">{item.date}</p>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        );
+                                                    })
+                                                ) : (
+                                                    <div className="w-full text-center py-16 bg-white rounded-2xl border border-dashed border-gray-200">
+                                                        <MessageSquare size={32} className="mx-auto text-gray-300 mb-3" />
+                                                        <p className="text-gray-500 font-medium">Belum ada testimoni saat ini.</p>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        {/* Call to action Testimoni */}
+                                        <div className="text-center mt-8 relative z-10">
+                                            <button 
+                                                onClick={() => setShowPublicTestimoniModal(true)} 
+                                                className="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-xl shadow-md hover:shadow-lg transition-all flex items-center gap-2 mx-auto"
+                                            >
+                                                <MessageSquarePlus size={20} />
+                                                Berikan Testimoni Anda
+                                            </button>
+                                        </div>
+                                    </div>
+                                </section>
+
+                                {/* LEADERBOARD / CONTRIBUTORS SECTION */}
+                                <section id="contributors" className="py-16 bg-white border-t border-gray-200">
+                                    <div className="max-w-5xl mx-auto px-4 sm:px-6">
+                                        <div className="text-center mb-16">
+                                            <span className="bg-red-100 text-red-600 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">Top Kontributor</span>
+                                            <h2 className="mt-3 text-3xl font-extrabold text-gray-900">Papan Peringkat RIANG</h2>
+                                            <p className="text-gray-500 text-sm mt-2">Apresiasi untuk para pendidik yang paling aktif berkontribusi.</p>
+                                        </div>
+
+                                        {isLoading && !contributors.length ? (
+                                            <div className="text-center text-gray-400 py-10">Memuat Data...</div>
+                                        ) : (
+                                            <div>
+                                                {/* PODIUM (Top 3) */}
+                                                <div className="flex justify-center items-end gap-4 mb-16 h-64 sm:h-72">
+                                                    {/* Rank 2 */}
+                                                    {contributors[1] && (
+                                                        <div className="w-1/3 max-w-[140px] flex flex-col items-center animate-podium" style={{ animationDelay: '0.2s' }}>
+                                                            <div className="relative mb-3">
+                                                                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full border-4 border-gray-300 bg-white overflow-hidden p-1 shadow-md">
+                                                                    <div className="w-full h-full bg-gray-200 rounded-full flex items-center justify-center text-gray-500 font-bold text-xl">{contributors[1].initials}</div>
+                                                                </div>
+                                                                <div className="absolute -top-3 -right-2 bg-gray-300 text-white rounded-full p-1 border-2 border-white shadow-sm"><Medal size={16} fill="currentColor" /></div>
+                                                            </div>
+                                                            <div className="bg-white w-full rounded-t-xl shadow-lg border-t-4 border-gray-300 p-4 text-center h-32 flex flex-col justify-end">
+                                                                <p className="font-bold text-gray-800 text-sm line-clamp-1">{contributors[1].name}</p>
+                                                                <p className="text-red-600 font-extrabold text-xs">{contributors[1].points} Poin</p>
+                                                                <div className="mt-2 text-2xl font-black text-gray-200">2</div>
+                                                            </div>
+                                                        </div>
+                                                    )}
+
+                                                    {/* Rank 1 */}
+                                                    {contributors[0] && (
+                                                        <div className="w-1/3 max-w-[160px] flex flex-col items-center z-10 animate-podium">
+                                                            <div className="relative mb-3">
+                                                                <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 text-yellow-400 animate-bounce"><Crown size={32} fill="currentColor" /></div>
+                                                                <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full border-4 border-yellow-400 bg-white overflow-hidden p-1 shadow-lg ring-4 ring-yellow-100">
+                                                                    <div className="w-full h-full bg-gradient-to-br from-yellow-100 to-yellow-300 rounded-full flex items-center justify-center text-yellow-700 font-bold text-2xl">{contributors[0].initials}</div>
+                                                                </div>
+                                                            </div>
+                                                            <div className="bg-gradient-to-b from-white to-yellow-50 w-full rounded-t-xl shadow-xl border-t-4 border-yellow-400 p-4 text-center h-40 flex flex-col justify-end relative">
+                                                                <p className="font-bold text-gray-900 text-base line-clamp-1">{contributors[0].name}</p>
+                                                                <p className="text-red-600 font-extrabold text-sm">{contributors[0].points} Poin</p>
+                                                                <div className="mt-2 text-4xl font-black text-yellow-400/30">1</div>
+                                                            </div>
+                                                        </div>
+                                                    )}
+
+                                                    {/* Rank 3 */}
+                                                    {contributors[2] && (
+                                                        <div className="w-1/3 max-w-[140px] flex flex-col items-center animate-podium" style={{ animationDelay: '0.4s' }}>
+                                                            <div className="relative mb-3">
+                                                                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full border-4 border-orange-300 bg-white overflow-hidden p-1 shadow-md">
+                                                                    <div className="w-full h-full bg-orange-100 rounded-full flex items-center justify-center text-orange-600 font-bold text-xl">{contributors[2].initials}</div>
+                                                                </div>
+                                                                <div className="absolute -top-3 -left-2 bg-orange-400 text-white rounded-full p-1 border-2 border-white shadow-sm"><Medal size={16} fill="currentColor" /></div>
+                                                            </div>
+                                                            <div className="bg-white w-full rounded-t-xl shadow-lg border-t-4 border-orange-300 p-4 text-center h-24 flex flex-col justify-end">
+                                                                <p className="font-bold text-gray-800 text-sm line-clamp-1">{contributors[2].name}</p>
+                                                                <p className="text-red-600 font-extrabold text-xs">{contributors[2].points} Poin</p>
+                                                                <div className="mt-2 text-2xl font-black text-orange-200">3</div>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                {/* Leaderboard List (Rank 4+) */}
+                                                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden max-w-2xl mx-auto">
+                                                    {contributors.slice(3).map((person, index) => (
+                                                        <div key={person.id} className="flex items-center p-4 border-b border-gray-50 last:border-0 hover:bg-gray-50 transition">
+                                                            <div className="w-8 text-center font-bold text-gray-400 text-sm">{index + 4}</div>
+                                                            <div className="ml-4 w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 font-bold text-xs shrink-0">
+                                                                {person.initials}
+                                                            </div>
+                                                            <div className="ml-4 flex-1">
+                                                                <h4 className="text-sm font-bold text-gray-900">{person.name}</h4>
+                                                                <p className="text-xs text-gray-500">{person.role}</p>
+                                                            </div>
+                                                            <div className="text-right">
+                                                                <span className="inline-block bg-red-50 text-red-600 text-xs font-extrabold px-3 py-1 rounded-full">
+                                                                    {person.points} Pts
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                    {contributors.length <= 3 && (
+                                                        <div className="p-6 text-center text-gray-400 text-sm">Belum ada kontributor lain.</div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </section>
+                            </div>
+                        )}
+
+                        {/* VIEW: SUBJECT DETAILS DENGAN PAGINATION */}
+                        {currentView === 'subject' && (
+                            <div className="animate-in fade-in max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                                <button onClick={() => setCurrentView('landing')} className="flex items-center gap-2 text-gray-500 hover:text-red-600 font-medium mb-8 transition group">
+                                    <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" /> Kembali ke Beranda
+                                </button>
+
+                                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 mb-8 border-l-8 border-l-red-600">
+                                    <h1 className="text-3xl font-extrabold text-gray-900 mb-2">Materi {activeSubject}</h1>
+                                    <p className="text-gray-500">Pilih materi pelajaran di bawah ini untuk mulai belajar atau mengunduh dokumen.</p>
+                                </div>
+
+                                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    {currentItems.length > 0 ? (
+                                        currentItems.map(item => (
+                                            <div key={item.id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition flex flex-col">
+                                                {/* Thumbnail */}
+                                                <div className={`h-40 flex items-center justify-center ${
+                                                    item.type === 'Video' ? 'bg-red-50 text-red-400' :
+                                                    item.type === 'Dokumen' ? 'bg-blue-50 text-blue-400' :
+                                                    item.type === 'Game' ? 'bg-indigo-50 text-indigo-400' :
+                                                    item.type === 'Media Pembelajaran' ? 'bg-teal-50 text-teal-400' :
+                                                    item.type === 'Gambar' ? 'bg-green-50 text-green-400' :
+                                                    'bg-gray-50 text-gray-400'
+                                                }`}>
+                                                    {item.type === 'Video' && <Video size={64} />}
+                                                    {item.type === 'Dokumen' && <FileText size={64} />}
+                                                    {item.type === 'Gambar' && <ImageIcon size={64} />}
+                                                    {item.type === 'Game' && <Gamepad2 size={64} />}
+                                                    {item.type === 'Media Pembelajaran' && <MonitorPlay size={64} />}
+                                                    {item.type === 'Lainnya' && <File size={64} />}
+                                                </div>
+                                                
+                                                <div className="p-5 flex-1 flex flex-col">
+                                                    <div className="flex justify-between items-start mb-2">
+                                                        <span className={`text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider ${
+                                                            item.type === 'Video' ? 'bg-red-100 text-red-700' :
+                                                            item.type === 'Dokumen' ? 'bg-blue-100 text-blue-700' :
+                                                            item.type === 'Game' ? 'bg-indigo-100 text-indigo-700' :
+                                                            item.type === 'Media Pembelajaran' ? 'bg-teal-100 text-teal-700' :
+                                                            'bg-green-100 text-green-700'
+                                                        }`}>
+                                                            {item.type}
+                                                        </span>
+                                                        <span className="text-xs font-bold text-gray-400 bg-gray-100 px-2 py-1 rounded">{item.grade}</span>
+                                                    </div>
+                                                    
+                                                    <h3 className="font-bold text-gray-900 text-lg mb-1 leading-tight">{item.title}</h3>
+                                                    
+                                                    {/* Info Tambahan (Kontributor & Rating) */}
+                                                    <div className="mb-3">
+                                                        {(item.rating || item.rating === 0) && (
+                                                            <div className="flex items-center gap-1 mb-1">
+                                                                {Array.from({length: parseInt(item.rating || 5)}).map((_, i) => <Star key={i} size={12} className="text-yellow-400 fill-current" />)}
+                                                            </div>
+                                                        )}
+                                                        {item.contributor && (
+                                                            <p className="text-[11px] text-gray-500 font-medium">Oleh: <span className="text-gray-700">{item.contributor}</span></p>
+                                                        )}
+                                                    </div>
+
+                                                    <p className="text-sm text-gray-500 mb-4 line-clamp-2 flex-1">{item.description}</p>
+                                                    
+                                                    <div className="pt-4 border-t border-gray-100 flex gap-2">
+                                                        <a href={item.url} target="_blank" rel="noreferrer" className="flex-1 text-center bg-gray-50 hover:bg-red-50 text-gray-700 hover:text-red-600 font-bold py-2.5 rounded-lg text-sm transition border border-gray-200 hover:border-red-200 flex justify-center items-center gap-2">
+                                                            <PlayCircle size={16} /> Buka Materi
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <div className="col-span-full text-center py-20 bg-white rounded-2xl border border-dashed border-gray-300">
+                                            <FileText size={48} className="mx-auto text-gray-300 mb-4" />
+                                            <h3 className="text-lg font-bold text-gray-600">Belum ada materi</h3>
+                                            <p className="text-gray-400 mt-1">Materi untuk pelajaran {activeSubject} sedang disiapkan.</p>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* BAGIAN PAGINASI */}
+                                {subjectMedia.length > 0 && (
+                                    <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+                                        <div className="flex items-center gap-2 text-sm text-gray-600 font-medium">
+                                            <span>Tampilkan:</span>
+                                            <select
+                                                value={itemsPerPage}
+                                                onChange={handleItemsPerPageChange}
+                                                className="border border-gray-300 rounded-md p-1.5 outline-none focus:ring-2 focus:ring-red-500 bg-white"
+                                            >
+                                                <option value={10}>10</option>
+                                                <option value={20}>20</option>
+                                                <option value={50}>50</option>
+                                                <option value={100}>100</option>
+                                            </select>
+                                            <span>data per halaman</span>
+                                        </div>
+
+                                        <div className="text-sm text-gray-500">
+                                            Menampilkan <span className="font-bold text-gray-900">{indexOfFirstItem + 1}</span> - <span className="font-bold text-gray-900">{Math.min(indexOfLastItem, subjectMedia.length)}</span> dari <span className="font-bold text-gray-900">{subjectMedia.length}</span> data
+                                        </div>
+
+                                        <div className="flex items-center gap-1">
+                                            <button
+                                                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                                                disabled={currentPage === 1}
+                                                className="p-1.5 rounded-md border border-gray-200 text-gray-600 hover:bg-red-50 hover:text-red-600 disabled:opacity-30 disabled:hover:bg-transparent disabled:cursor-not-allowed transition"
+                                                title="Sebelumnya"
+                                            >
+                                                <ChevronLeft size={20} />
+                                            </button>
+                                            
+                                            {/* Nomor Halaman */}
+                                            {Array.from({ length: totalPages }, (_, i) => i + 1).map(pageNum => (
+                                                <button
+                                                    key={pageNum}
+                                                    onClick={() => setCurrentPage(pageNum)}
+                                                    className={`w-9 h-9 flex items-center justify-center rounded-md text-sm font-bold transition ${
+                                                        currentPage === pageNum 
+                                                            ? 'bg-red-600 text-white shadow-md' 
+                                                            : 'border border-gray-200 text-gray-600 hover:bg-red-50 hover:text-red-600'
+                                                    }`}
+                                                >
+                                                    {pageNum}
+                                                </button>
+                                            ))}
+
+                                            <button
+                                                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                                                disabled={currentPage === totalPages}
+                                                className="p-1.5 rounded-md border border-gray-200 text-gray-600 hover:bg-red-50 hover:text-red-600 disabled:opacity-30 disabled:hover:bg-transparent disabled:cursor-not-allowed transition"
+                                                title="Selanjutnya"
+                                            >
+                                                <ChevronRight size={20} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+                        {/* VIEW: ADMIN DASHBOARD */}
+                        {currentView === 'dashboard' && isAdmin && (
+                            <div className="animate-in fade-in max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                                <div className="flex justify-between items-end mb-8 border-b border-gray-200 pb-4">
+                                    <div>
+                                        <h1 className="text-3xl font-extrabold text-gray-900">Dashboard Admin</h1>
+                                        <p className="text-gray-500">Kelola konten repositori RIANG.</p>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-12">
+                                    {/* KELOLA MATERI */}
+                                    <section>
+                                        <div className="flex justify-between items-center mb-4">
+                                            <h2 className="text-xl font-bold flex items-center gap-2"><BookOpen size={24} className="text-red-600"/> Kelola Materi</h2>
+                                            <button onClick={() => setEditingMedia({ title: '', subject: 'Game PID', grade: 'Kelas 1', type: 'Media Pembelajaran', url: '', description: '', rating: 5, contributor: '' })} className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2">
+                                                <Plus size={16} /> Tambah Materi
+                                            </button>
+                                        </div>
+                                        
+                                        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                                            <div className="overflow-x-auto">
+                                                <table className="w-full text-left border-collapse">
+                                                    <thead>
+                                                        <tr className="bg-gray-50 text-gray-600 text-sm border-b border-gray-200">
+                                                            <th className="p-4 font-bold">Judul</th>
+                                                            <th className="p-4 font-bold">Mata Pelajaran</th>
+                                                            <th className="p-4 font-bold">Tipe</th>
+                                                            <th className="p-4 font-bold">Kontributor</th>
+                                                            <th className="p-4 font-bold text-right">Aksi</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {mediaItems.map(item => (
+                                                            <tr key={item.id} className="border-b border-gray-100 hover:bg-gray-50">
+                                                                <td className="p-4">
+                                                                    <p className="font-bold text-gray-900">{item.title}</p>
+                                                                    <p className="text-xs text-gray-500">{item.grade}</p>
+                                                                </td>
+                                                                <td className="p-4 text-gray-600">{item.subject}</td>
+                                                                <td className="p-4">
+                                                                    <span className={`text-xs px-2.5 py-1 rounded font-bold ${
+                                                                        item.type === 'Game' ? 'bg-indigo-100 text-indigo-700' : 
+                                                                        item.type === 'Media Pembelajaran' ? 'bg-teal-100 text-teal-700' :
+                                                                        'bg-gray-100 text-gray-600'
+                                                                    }`}>{item.type}</span>
+                                                                </td>
+                                                                <td className="p-4 text-gray-600 text-sm">{item.contributor || '-'}</td>
+                                                                <td className="p-4 flex justify-end gap-2">
+                                                                    <button onClick={() => setEditingMedia(item)} className="p-2 text-blue-600 hover:bg-blue-50 rounded transition"><Edit size={18} /></button>
+                                                                    <button onClick={() => handleDeleteMedia(item.id)} className="p-2 text-red-600 hover:bg-red-50 rounded transition"><Trash2 size={18} /></button>
+                                                                </td>
+                                                            </tr>
+                                                        ))}
+                                                        {mediaItems.length === 0 && (
+                                                            <tr><td colSpan="5" className="p-8 text-center text-gray-400">Belum ada data materi.</td></tr>
+                                                        )}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </section>
+
+                                    {/* KELOLA KONTRIBUTOR */}
+                                    <section>
+                                        <div className="flex justify-between items-center mb-4">
+                                            <h2 className="text-xl font-bold flex items-center gap-2"><Trophy size={24} className="text-yellow-500"/> Kelola Kontributor</h2>
+                                            <button onClick={() => setEditingContributor({ name: '', role: 'Guru Kelas', initials: '', points: 0, level: 'Level 1 - Newbie' })} className="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2">
+                                                <Plus size={16} /> Tambah Kontributor
+                                            </button>
+                                        </div>
+                                        
+                                        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                                            <div className="overflow-x-auto">
+                                                <table className="w-full text-left border-collapse">
+                                                    <thead>
+                                                        <tr className="bg-gray-50 text-gray-600 text-sm border-b border-gray-200">
+                                                            <th className="p-4 font-bold">Nama</th>
+                                                            <th className="p-4 font-bold">Peran/Instansi</th>
+                                                            <th className="p-4 font-bold">Level</th>
+                                                            <th className="p-4 font-bold">Inisial</th>
+                                                            <th className="p-4 font-bold">Poin</th>
+                                                            <th className="p-4 font-bold text-right">Aksi</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {contributors.map(item => (
+                                                            <tr key={item.id} className="border-b border-gray-100 hover:bg-gray-50">
+                                                                <td className="p-4 font-medium text-gray-900">{item.name}</td>
+                                                                <td className="p-4 text-gray-600">{item.role}</td>
+                                                                <td className="p-4 text-gray-600">
+                                                                    <span className="text-xs bg-indigo-50 text-indigo-700 font-semibold px-2.5 py-1 rounded-full border border-indigo-100">
+                                                                        {item.level || 'Level 1 - Newbie'}
+                                                                    </span>
+                                                                </td>
+                                                                <td className="p-4 text-gray-600">{item.initials}</td>
+                                                                <td className="p-4 font-bold text-red-600">{item.points}</td>
+                                                                <td className="p-4 flex justify-end gap-2">
+                                                                    <button onClick={() => setEditingContributor(item)} className="p-2 text-blue-600 hover:bg-blue-50 rounded"><Edit size={18} /></button>
+                                                                    <button onClick={() => handleDeleteContributor(item.id)} className="p-2 text-red-600 hover:bg-red-50 rounded"><Trash2 size={18} /></button>
+                                                                </td>
+                                                            </tr>
+                                                        ))}
+                                                        {contributors.length === 0 && (
+                                                            <tr><td colSpan="6" className="p-8 text-center text-gray-400">Belum ada kontributor.</td></tr>
+                                                        )}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </section>
+
+                                    {/* KELOLA TESTIMONI */}
+                                    <section>
+                                        <div className="flex justify-between items-center mb-4">
+                                            <h2 className="text-xl font-bold flex items-center gap-2"><MessageSquare size={24} className="text-blue-500"/> Kelola Testimoni</h2>
+                                            <button onClick={() => setEditingTestimoni({ name: '', category: 'Testimoni Siswa', rating: 5, text: '', date: new Date().toLocaleDateString('id-ID') })} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2">
+                                                <Plus size={16} /> Tambah Testimoni Manual
+                                            </button>
+                                        </div>
+                                        
+                                        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                                            <div className="overflow-x-auto">
+                                                <table className="w-full text-left border-collapse">
+                                                    <thead>
+                                                        <tr className="bg-gray-50 text-gray-600 text-sm border-b border-gray-200">
+                                                            <th className="p-4 font-bold">Pengirim</th>
+                                                            <th className="p-4 font-bold">Kategori</th>
+                                                            <th className="p-4 font-bold">Rating</th>
+                                                            <th className="p-4 font-bold">Pesan</th>
+                                                            <th className="p-4 font-bold text-right">Aksi</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {testimonials.map(item => (
+                                                            <tr key={item.id} className="border-b border-gray-100 hover:bg-gray-50">
+                                                                <td className="p-4 font-medium text-gray-900">{item.name}</td>
+                                                                <td className="p-4 text-gray-600"><span className="text-xs bg-gray-100 px-2 py-1 rounded">{item.category}</span></td>
+                                                                <td className="p-4 text-yellow-500 flex mt-4">{Array.from({length: parseInt(item.rating || 5)}).map((_, i) => <Star key={i} size={14} fill="currentColor" />)}</td>
+                                                                <td className="p-4 text-gray-600 text-sm max-w-xs truncate">{item.text}</td>
+                                                                <td className="p-4 flex justify-end gap-2">
+                                                                    <button onClick={() => setEditingTestimoni(item)} className="p-2 text-blue-600 hover:bg-blue-50 rounded"><Edit size={18} /></button>
+                                                                    <button onClick={() => handleDeleteTestimoni(item.id)} className="p-2 text-red-600 hover:bg-red-50 rounded"><Trash2 size={18} /></button>
+                                                                </td>
+                                                            </tr>
+                                                        ))}
+                                                        {testimonials.length === 0 && (
+                                                            <tr><td colSpan="5" className="p-8 text-center text-gray-400">Belum ada testimoni.</td></tr>
+                                                        )}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </section>
+                                </div>
+                            </div>
+                        )}
+                    </main>
+
+                    {/* --- MODALS --- */}
+
+                    {/* Modal: Admin Login */}
+                    {showLoginModal && (
+                        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                            <div className="bg-white rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200">
+                                <div className="bg-red-600 px-6 py-4 flex justify-between items-center text-white">
+                                    <h3 className="font-bold text-lg flex items-center gap-2"><Lock size={20} /> Login Admin</h3>
+                                    <button onClick={() => {setShowLoginModal(false); setPasswordInput('');}} className="text-white/80 hover:text-white"><X size={24} /></button>
+                                </div>
+                                <form onSubmit={handleLoginSubmit} className="p-6 space-y-4">
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 mb-1">Masukkan Password</label>
+                                        <input 
+                                            autoFocus
+                                            required 
+                                            type="password" 
+                                            value={passwordInput} 
+                                            onChange={e => setPasswordInput(e.target.value)} 
+                                            className="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-red-500 outline-none" 
+                                            placeholder="••••••••" 
+                                        />
+                                    </div>
+                                    <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
+                                        <button type="button" onClick={() => {setShowLoginModal(false); setPasswordInput('');}} className="px-4 py-2 text-gray-600 font-bold hover:bg-gray-100 rounded-lg">Batal</button>
+                                        <button type="submit" className="px-6 py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg shadow-md flex items-center gap-2">
+                                            Masuk <ChevronRight size={18} />
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Modal: Public Testimoni Form */}
+                    {showPublicTestimoniModal && (
+                        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                            <div className="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200">
+                                <div className="bg-red-600 px-6 py-4 flex justify-between items-center text-white">
+                                    <h3 className="font-bold text-lg flex items-center gap-2"><MessageSquarePlus size={20} /> Tulis Testimoni Anda</h3>
+                                    <button onClick={() => setShowPublicTestimoniModal(false)} className="text-white/80 hover:text-white"><X size={24} /></button>
+                                </div>
+                                <form onSubmit={handlePublicSubmitTestimoni} className="p-6 space-y-4">
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 mb-1">Nama Anda *</label>
+                                        <input required type="text" value={publicTestimoni.name} onChange={e => setPublicTestimoni({...publicTestimoni, name: e.target.value})} className="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none" placeholder="Contoh: Budi, Bunda Ani" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 mb-1">Peran Anda</label>
+                                        <select value={publicTestimoni.category} onChange={e => setPublicTestimoni({...publicTestimoni, category: e.target.value})} className="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none">
+                                            <option value="Testimoni Siswa">Saya Siswa</option>
+                                            <option value="Testimoni Guru">Saya Guru</option>
+                                            <option value="Testimoni Orang Tua">Saya Orang Tua</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 mb-1">Penilaian (Rating)</label>
+                                        <div className="flex gap-2 mb-2">
+                                            {[1,2,3,4,5].map(star => (
+                                                <button 
+                                                    key={star} 
+                                                    type="button" 
+                                                    onClick={() => setPublicTestimoni({...publicTestimoni, rating: star})} 
+                                                    className="focus:outline-none transition-transform hover:scale-110"
+                                                >
+                                                    <Star size={32} className={star <= publicTestimoni.rating ? "text-yellow-400 fill-current" : "text-gray-300"} />
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 mb-1">Pesan / Testimoni *</label>
+                                        <textarea required rows="4" value={publicTestimoni.text} onChange={e => setPublicTestimoni({...publicTestimoni, text: e.target.value})} className="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none" placeholder="Ceritakan pengalaman Anda menggunakan RIANG..."></textarea>
+                                    </div>
+                                    <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
+                                        <button type="button" onClick={() => setShowPublicTestimoniModal(false)} className="px-4 py-2 text-gray-600 font-bold hover:bg-gray-100 rounded-lg">Batal</button>
+                                        <button type="submit" className="px-6 py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg shadow-md flex items-center gap-2">
+                                            <Save size={18} /> Kirim Testimoni
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Modal: Admin Media */}
+                    {editingMedia && (
+                        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                            <div className="bg-white rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200">
+                                <div className="bg-gray-50 px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                                    <h3 className="font-bold text-lg text-gray-900">{editingMedia.id ? 'Edit Materi' : 'Tambah Materi Baru'}</h3>
+                                    <button onClick={() => setEditingMedia(null)} className="text-gray-400 hover:text-gray-600"><X size={20} /></button>
+                                </div>
+                                <form onSubmit={handleSaveMedia} className="p-6 space-y-4">
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 mb-1">Judul Materi</label>
+                                        <input required type="text" value={editingMedia.title} onChange={e => setEditingMedia({...editingMedia, title: e.target.value})} className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-red-500 outline-none" placeholder="Judul..." />
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="block text-sm font-bold text-gray-700 mb-1">Mata Pelajaran</label>
+                                            <select value={editingMedia.subject} onChange={e => setEditingMedia({...editingMedia, subject: e.target.value})} className="w-full border border-gray-300 rounded-lg p-2 outline-none">
+                                                <option value="Matematika">Matematika</option>
+                                                <option value="B. Indonesia">B. Indonesia</option>
+                                                <option value="IPAS">IPAS</option>
+                                                <option value="Seni Budaya">Seni Budaya</option>
+                                                <option value="B. Inggris">B. Inggris</option>
+                                                <option value="Informatika">Informatika</option>
+                                                <option value="Game PID">Game PID</option>
+                                                <option value="Agama">Agama</option>
+                                                <option value="Pancasila">Pancasila</option>
+                                                <option value="Lainnya">Lainnya</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-bold text-gray-700 mb-1">Tipe</label>
+                                            <select value={editingMedia.type} onChange={e => setEditingMedia({...editingMedia, type: e.target.value})} className="w-full border border-gray-300 rounded-lg p-2 outline-none">
+                                                <option value="Media Pembelajaran">Media Pembelajaran</option>
+                                                <option value="Video">Video</option>
+                                                <option value="Dokumen">Dokumen</option>
+                                                <option value="Game">Game</option>
+                                                <option value="Gambar">Gambar</option>
+                                                <option value="Lainnya">Lainnya</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <div>
+                                            <label className="block text-sm font-bold text-gray-700 mb-1">Kelas</label>
+                                            <input required type="text" value={editingMedia.grade} onChange={e => setEditingMedia({...editingMedia, grade: e.target.value})} className="w-full border border-gray-300 rounded-lg p-2 outline-none" placeholder="Misal: Kelas 1" />
+                                        </div>
+                                        <div className="md:col-span-2">
+                                            <label className="block text-sm font-bold text-gray-700 mb-1">Kontributor (Opsional)</label>
+                                            <select 
+                                                value={editingMedia.contributor || ''} 
+                                                onChange={e => setEditingMedia({...editingMedia, contributor: e.target.value})} 
+                                                className="w-full border border-gray-300 rounded-lg p-2 outline-none bg-white"
+                                            >
+                                                <option value="">-- Pilih Kontributor --</option>
+                                                {contributors.map(contributor => (
+                                                    <option key={contributor.id} value={contributor.name}>
+                                                        {contributor.name}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                        <div className="md:col-span-3">
+                                            <label className="block text-sm font-bold text-gray-700 mb-1">Link/URL Materi</label>
+                                            <input required type="url" value={editingMedia.url} onChange={e => setEditingMedia({...editingMedia, url: e.target.value})} className="w-full border border-gray-300 rounded-lg p-2 outline-none" placeholder="https://" />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-bold text-gray-700 mb-1">Rating</label>
+                                            <input required type="number" min="1" max="5" value={editingMedia.rating || 5} onChange={e => setEditingMedia({...editingMedia, rating: e.target.value})} className="w-full border border-gray-300 rounded-lg p-2 outline-none" placeholder="1-5" />
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 mb-1">Deskripsi Singkat</label>
+                                        <textarea rows="2" value={editingMedia.description} onChange={e => setEditingMedia({...editingMedia, description: e.target.value})} className="w-full border border-gray-300 rounded-lg p-2 outline-none" placeholder="Keterangan materi..."></textarea>
+                                    </div>
+                                    <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
+                                        <button type="button" onClick={() => setEditingMedia(null)} className="px-4 py-2 text-gray-600 font-bold hover:bg-gray-100 rounded-lg">Batal</button>
+                                        <button type="submit" className="px-5 py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg flex items-center gap-2 shadow-sm"><Save size={16} /> Simpan Materi</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Modal: Admin Contributor */}
+                    {editingContributor && (
+                        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                            <div className="bg-white rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200">
+                                <div className="bg-gray-50 px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                                    <h3 className="font-bold text-lg text-gray-900">{editingContributor.id ? 'Edit Kontributor' : 'Tambah Kontributor'}</h3>
+                                    <button onClick={() => setEditingContributor(null)} className="text-gray-400 hover:text-gray-600"><X size={20} /></button>
+                                </div>
+                                <form onSubmit={handleSaveContributor} className="p-6 space-y-4">
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 mb-1">Nama Kontributor</label>
+                                        <input required type="text" value={editingContributor.name} onChange={e => setEditingContributor({...editingContributor, name: e.target.value})} className="w-full border border-gray-300 rounded-lg p-2 outline-none" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 mb-1">Peran / Instansi</label>
+                                        <input required type="text" value={editingContributor.role} onChange={e => setEditingContributor({...editingContributor, role: e.target.value})} className="w-full border border-gray-300 rounded-lg p-2 outline-none" placeholder="Guru Kelas VI" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 mb-1">Level Kontributor</label>
+                                        <select 
+                                            value={editingContributor.level || 'Level 1 - Newbie'} 
+                                            onChange={e => setEditingContributor({...editingContributor, level: e.target.value})} 
+                                            className="w-full border border-gray-300 rounded-lg p-2 outline-none bg-white"
+                                        >
+                                            <option value="Level 1 - Newbie">Level 1 - Newbie</option>
+                                            <option value="Level 2 - Contributors">Level 2 - Contributors</option>
+                                            <option value="Level 3 - Master">Level 3 - Master</option>
+                                        </select>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="block text-sm font-bold text-gray-700 mb-1">Inisial (2 Huruf)</label>
+                                            <input required type="text" maxLength="2" value={editingContributor.initials} onChange={e => setEditingContributor({...editingContributor, initials: e.target.value.toUpperCase()})} className="w-full border border-gray-300 rounded-lg p-2 outline-none text-center font-bold" />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-bold text-gray-700 mb-1">Total Poin</label>
+                                            <input required type="number" value={editingContributor.points} onChange={e => setEditingContributor({...editingContributor, points: e.target.value})} className="w-full border border-gray-300 rounded-lg p-2 outline-none" />
+                                        </div>
+                                    </div>
+                                    <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
+                                        <button type="button" onClick={() => setEditingContributor(null)} className="px-4 py-2 text-gray-600 font-bold hover:bg-gray-100 rounded-lg">Batal</button>
+                                        <button type="submit" className="px-4 py-2 bg-gray-800 hover:bg-gray-900 text-white font-bold rounded-lg flex items-center gap-2"><Save size={16} /> Simpan</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Modal: Admin Testimoni */}
+                    {editingTestimoni && (
+                        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                            <div className="bg-white rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200">
+                                <div className="bg-gray-50 px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                                    <h3 className="font-bold text-lg text-gray-900">{editingTestimoni.id ? 'Edit Testimoni' : 'Tambah Testimoni Manual'}</h3>
+                                    <button onClick={() => setEditingTestimoni(null)} className="text-gray-400 hover:text-gray-600"><X size={20} /></button>
+                                </div>
+                                <form onSubmit={handleSaveTestimoni} className="p-6 space-y-4">
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 mb-1">Nama</label>
+                                        <input required type="text" value={editingTestimoni.name} onChange={e => setEditingTestimoni({...editingTestimoni, name: e.target.value})} className="w-full border border-gray-300 rounded-lg p-2 outline-none" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 mb-1">Kategori</label>
+                                        <select value={editingTestimoni.category} onChange={e => setEditingTestimoni({...editingTestimoni, category: e.target.value})} className="w-full border border-gray-300 rounded-lg p-2 outline-none">
+                                            <option value="Testimoni Siswa">Siswa</option>
+                                            <option value="Testimoni Guru">Guru</option>
+                                            <option value="Testimoni Orang Tua">Orang Tua</option>
+                                        </select>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="block text-sm font-bold text-gray-700 mb-1">Rating (1-5)</label>
+                                            <input required type="number" min="1" max="5" value={editingTestimoni.rating} onChange={e => setEditingTestimoni({...editingTestimoni, rating: e.target.value})} className="w-full border border-gray-300 rounded-lg p-2 outline-none" />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-bold text-gray-700 mb-1">Tanggal</label>
+                                            <input required type="text" value={editingTestimoni.date} onChange={e => setEditingTestimoni({...editingTestimoni, date: e.target.value})} className="w-full border border-gray-300 rounded-lg p-2 outline-none" placeholder="10 Okt 2023" />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 mb-1">Pesan / Teks</label>
+                                        <textarea required rows="3" value={editingTestimoni.text} onChange={e => setEditingTestimoni({...editingTestimoni, text: e.target.value})} className="w-full border border-gray-300 rounded-lg p-2 outline-none"></textarea>
+                                    </div>
+                                    <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
+                                        <button type="button" onClick={() => setEditingTestimoni(null)} className="px-4 py-2 text-gray-600 font-bold hover:bg-gray-100 rounded-lg">Batal</button>
+                                        <button type="submit" className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg flex items-center gap-2"><Save size={16} /> Simpan</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        // Render React DOM
+        const rootElement = document.getElementById('root');
+        const root = createRoot(rootElement);
+        root.render(<App />);
+
+    </script>
+    <!-- Script untuk mempersulit akses Inspect Element & View Source -->
+    <script>
+        // Mematikan Klik Kanan
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+        });
+
+        // Mematikan shortcut keyboard tertentu
+        document.addEventListener('keydown', function(e) {
+            // Mematikan F12
+            if (e.key === 'F12' || e.keyCode === 123) {
+                e.preventDefault();
+            }
+            // Mematikan Ctrl+Shift+I (Inspect)
+            if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i')) {
+                e.preventDefault();
+            }
+            // Mematikan Ctrl+Shift+J (Console)
+            if (e.ctrlKey && e.shiftKey && (e.key === 'J' || e.key === 'j')) {
+                e.preventDefault();
+            }
+            // Mematikan Ctrl+Shift+C (Inspect Element)
+            if (e.ctrlKey && e.shiftKey && (e.key === 'C' || e.key === 'c')) {
+                e.preventDefault();
+            }
+            // Mematikan Ctrl+U (View Source)
+            if (e.ctrlKey && (e.key === 'U' || e.key === 'u')) {
+                e.preventDefault();
+            }
+        });
+    </script>
+</body>
+</html>
